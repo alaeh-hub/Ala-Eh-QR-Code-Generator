@@ -102,12 +102,135 @@ img {
   pointer-events: none;
 }
 
-.splash-video {
+.splash.is-flying {
+  background: transparent;
+  pointer-events: none;
+  transition: background-color .8s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Copy of the page logo the coin turns into on its way there */
+.splash-twin {
+  position: fixed;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.splash-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
   width: min(78vw, 78vh, 520px);
-  height: auto;
   aspect-ratio: 1;
+  opacity: 0;
+}
+
+/* Entrance: the coin rises out of a soft blur instead of popping in */
+.splash.is-playing .splash-stage {
+  animation: splash-in 1.3s cubic-bezier(.16, 1, .3, 1) forwards;
+}
+
+.splash.is-settled .splash-stage {
+  animation: none;
+  opacity: 1;
+}
+
+@keyframes splash-in {
+  from {
+    opacity: 0;
+    transform: scale(.72) translateY(18px);
+    filter: blur(14px) brightness(1.6);
+  }
+
+  60% {
+    filter: blur(0) brightness(1.1);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Warm gold light behind the coin */
+.splash-glow {
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 196, 46, .38) 0%, rgba(255, 150, 20, .16) 32%, rgba(255, 140, 0, 0) 62%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .6s ease;
+}
+
+.splash.is-playing .splash-glow {
+  animation: glow-in 1.8s ease-out .2s forwards, glow-breathe 3.2s ease-in-out 2s infinite;
+}
+
+.splash.is-landed .splash-glow {
+  animation: glow-flare 1s ease-out forwards, glow-breathe 3.2s ease-in-out 1s infinite;
+}
+
+.splash.is-flying .splash-glow {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes glow-in {
+  from { opacity: 0; transform: scale(.6); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes glow-flare {
+  0% { opacity: 1; transform: none; }
+  30% { opacity: 1; transform: scale(1.12); filter: brightness(1.5); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes glow-breathe {
+  0%, 100% { opacity: 1; transform: none; }
+  50% { opacity: .75; transform: scale(.96); }
+}
+
+/* Ring of light that ripples out when the coin lands face-front */
+.splash-ring {
+  position: absolute;
+  inset: 9%;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 214, 90, .9);
+  box-shadow: 0 0 24px rgba(255, 196, 46, .6), inset 0 0 24px rgba(255, 196, 46, .35);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash.is-landed .splash-ring {
+  animation: ring-out 1.1s cubic-bezier(.2, .7, .3, 1) forwards;
+}
+
+@keyframes ring-out {
+  0% { opacity: 0; transform: scale(.94); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.45); border-width: 1px; }
+}
+
+.splash-video {
+  position: relative;
+  will-change: transform, clip-path;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   background: transparent;
+  /* the coin never leaves this circle; clipping hides the MP4 fallback's black corners */
+  clip-path: circle(42% at 50% 50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-stage,
+  .splash-glow {
+    animation: none !important;
+    opacity: 1;
+  }
 }
 
 @keyframes breathe {

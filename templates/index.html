@@ -14,50 +14,137 @@
 </head>
 
 <body>
-  <div id="splash" class="splash" aria-hidden="true">
-    <video class="splash-video" autoplay muted playsinline preload="auto"
-      poster="{{ url_for('static', filename='img/alaeh-logo-3d-poster.png') }}">
-      <source src="{{ url_for('static', filename='video/alaeh-logo-3d.webm') }}" type="video/webm" />
-      <source src="{{ url_for('static', filename='video/alaeh-logo-3d-black.mp4') }}" type="video/mp4" />
-    </video>
+  <div id="splash" class="splash" aria-hidden="true"
+    data-poster="{{ url_for('static', filename='img/alaeh-logo-3d-poster.png') }}">
+    <div class="splash-stage">
+      <div class="splash-glow"></div>
+      <div class="splash-ring"></div>
+      <video class="splash-video" autoplay muted playsinline preload="auto">
+        <source src="{{ url_for('static', filename='video/alaeh-logo-3d.webm') }}" type="video/webm" />
+        <source src="{{ url_for('static', filename='video/alaeh-logo-3d-black.mp4') }}" type="video/mp4" />
+      </video>
+    </div>
   </div>
   <script>
     (function () {
       var splash = document.getElementById("splash");
       var video = splash.querySelector("video");
       var done = false;
-      function hide() {
-        if (done) return;
-        done = true;
+      var LOGO_FILL = 881 / 1080; // share of the video frame the round logo covers
+      function fade() {
         splash.classList.add("is-hidden");
         setTimeout(function () { splash.remove(); }, 600);
       }
-      var seen = false;
-      try { seen = sessionStorage.getItem("alaeh-splash-seen") === "1"; } catch (e) {}
-      if (seen) { splash.remove(); return; }
-      try { sessionStorage.setItem("alaeh-splash-seen", "1"); } catch (e) {}
+      // Land on the big header logo if it's on screen, else the navbar logo.
+      function pickTarget() {
+        var els = [document.querySelector(".app-icon"), document.querySelector(".navbar-logo")];
+        for (var i = 0; i < els.length; i++) {
+          var el = els[i];
+          if (!el) continue;
+          var r = el.getBoundingClientRect();
+          var onScreen = r.width && r.top >= 0 && r.bottom <= window.innerHeight;
+          if (onScreen && parseFloat(getComputedStyle(el).opacity) > 0.5) return el;
+        }
+        return null;
+      }
+      // Fly the coin along a gentle arc into the page logo. Halfway there it
+      // cross-fades into an exact copy of that logo, so it lands pixel-perfect.
+      var FLY_MS = 1150;
+      function ease(t) { // smooth ease-in-out with a soft start and a long settle
+        return t < .5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
+      }
+      function hide() {
+        if (done) return;
+        done = true;
+        var target = pickTarget();
+        if (!target || !video.animate) return fade();
+        video.pause();
+        splash.classList.add("is-settled"); // snap the entrance to its end state before measuring
+        var t = target.getBoundingClientRect();
+        var v = video.getBoundingClientRect();
+        if (!t.width || !v.width) return fade();
+
+        var vc = { x: v.left + v.width / 2, y: v.top + v.height / 2 };
+        var tc = { x: t.left + t.width / 2, y: t.top + t.height / 2 };
+        var d0 = v.width * LOGO_FILL, d1 = t.width; // visible coin diameter, start and end
+        // Bend the path: pull the control point sideways so it swoops rather than slides.
+        var mx = (vc.x + tc.x) / 2, my = (vc.y + tc.y) / 2;
+        var nx = -(tc.y - vc.y) * 0.22, ny = (tc.x - vc.x) * 0.22;
+        var k = { x: mx + nx, y: my + ny };
+
+        // A copy of the page logo, laid out exactly where the real one is.
+        var twin = new Image();
+        twin.src = target.currentSrc || target.src;
+        twin.alt = "";
+        twin.className = "splash-twin";
+        twin.style.cssText = "left:" + t.left + "px;top:" + t.top + "px;width:" + t.width + "px;height:" + t.height + "px;filter:" + getComputedStyle(target).filter;
+        splash.appendChild(twin);
+
+        var vFrames = [], tFrames = [], N = 48;
+        for (var i = 0; i <= N; i++) {
+          var e = ease(i / N), u = 1 - e;
+          var cx = u * u * vc.x + 2 * u * e * k.x + e * e * tc.x;
+          var cy = u * u * vc.y + 2 * u * e * k.y + e * e * tc.y;
+          var dia = Math.exp(Math.log(d0) + (Math.log(d1) - Math.log(d0)) * e); // scale evenly, not linearly
+          var mix = Math.min(1, Math.max(0, (e - .45) / .4)); // coin -> logo cross-fade
+          vFrames.push({ transform: "translate(" + (cx - vc.x) + "px," + (cy - vc.y) + "px) scale(" + dia / d0 + ")", opacity: 1 - mix });
+          tFrames.push({ transform: "translate(" + (cx - tc.x) + "px," + (cy - tc.y) + "px) scale(" + dia / d1 + ")", opacity: mix });
+        }
+        target.style.visibility = "hidden";
+        splash.classList.add("is-flying");
+        video.style.clipPath = "circle(" + (LOGO_FILL * 50) + "% at 50% 50%)";
+        var opts = { duration: FLY_MS, easing: "linear", fill: "forwards" };
+        video.animate(vFrames, opts);
+        twin.animate(tFrames, opts).onfinish = function () {
+          // The twin sits exactly on the real logo now; swap them in the same frame.
+          target.style.visibility = "";
+          splash.remove();
+          target.animate([
+            { transform: "scale(1)" }, { transform: "scale(1.07)", offset: .35 }, { transform: "scale(1)" }
+          ], { duration: 420, easing: "cubic-bezier(.3,.7,.4,1)" });
+        };
+      }
+      // The header logo is rendered by React; give it a moment to mount.
+      function hideWhenReady() {
+        var tries = 0;
+        (function wait() {
+          if (document.querySelector(".app-icon") || tries++ > 20) hide();
+          else setTimeout(wait, 50);
+        })();
+      }
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         video.removeAttribute("autoplay");
         video.pause();
-        setTimeout(hide, 900);
+        video.poster = splash.dataset.poster;
+        splash.classList.add("is-playing", "is-settled");
+        setTimeout(function () { done = true; fade(); }, 900);
         return;
       }
-      video.addEventListener("ended", hide);
-      video.addEventListener("error", hide, true);
-      splash.addEventListener("click", hide);
+      function bail() { if (!done) { done = true; fade(); } }
+      // Start the entrance only once frames are actually moving, so nothing pops in.
+      video.addEventListener("playing", function () { splash.classList.add("is-playing"); }, { once: true });
+      // Pulse a ring of light when the coin turns face-front (~2.3s into the video).
+      video.addEventListener("timeupdate", function landed() {
+        if (video.currentTime < 2.2) return;
+        splash.classList.add("is-landed");
+        video.removeEventListener("timeupdate", landed);
+      });
+      video.addEventListener("ended", hideWhenReady);
+      video.addEventListener("error", bail, true);
+      splash.addEventListener("click", hideWhenReady);
       var p = video.play();
-      if (p && p.catch) p.catch(function () { setTimeout(hide, 1200); });
-      setTimeout(hide, 7000); // safety net if the video stalls
+      if (p && p.catch) p.catch(function () { setTimeout(bail, 1200); });
+      setTimeout(hideWhenReady, 7000); // safety net if the video stalls
     })();
   </script>
 
   <div id="root">
     <div class="boot" aria-label="Loading">
-      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="" />
+      <img src="{{ url_for('static', filename='img/alaeh-logo-3d-poster.png') }}" alt="" />
     </div>
   </div>
 
-  <script>window.LOGO_URL = "{{ url_for('static', filename='img/logo.png') }}";</script>
+  <script>window.LOGO_URL = "{{ url_for('static', filename='img/alaeh-logo-3d-poster.png') }}";</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
