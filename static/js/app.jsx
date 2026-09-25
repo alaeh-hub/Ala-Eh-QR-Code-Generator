@@ -22,12 +22,12 @@ const QUICK_LINKS = [
 ];
 
 const PRESETS = [
+  { name: "Ala Eh!", fg: "#000000", fg2: "#000000", bg: "#FFD400", gradient: "none", note: "Company black on Ala Eh! yellow" },
   { name: "Toyo", fg: "#FFFFFF", fg2: "#FFFFFF", bg: "#1A0F08", gradient: "none", note: "White on soy-dark brown" },
   { name: "Suka", fg: "#3B2410", fg2: "#3B2410", bg: "#F3E9D2", gradient: "none", note: "Brown on pale vinegar cream" },
   { name: "Catsup", fg: "#FFFFFF", fg2: "#FFE9B3", bg: "#D94A1A", gradient: "vertical", note: "White to cream on banana-catsup orange" },
   { name: "Sili", fg: "#FFFFFF", fg2: "#FFFFFF", bg: "#B81A13", gradient: "none", note: "White on chili red" },
   { name: "Oil", fg: "#5C3A00", fg2: "#5C3A00", bg: "#FFC93C", gradient: "radial", note: "Amber brown on cooking-oil gold" },
-  { name: "Patis", fg: "#2B1B00", fg2: "#8A5A1E", bg: "#F6D98A", gradient: "vertical", note: "Dark to amber brown on patis gold" },
 ];
 
 const PATTERNS = [
@@ -704,6 +704,10 @@ function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [ready]);
 
+  /* Preview card color, and a text color that stays readable on it */
+  const stickerBg = frame === "badge" && ready && validHex(fg) ? fg : validHex(bg) ? bg : "#FFFFFF";
+  const onSticker = luminance(stickerBg) > 0.18 ? "rgba(0, 0, 0, .75)" : "rgba(255, 255, 255, .85)";
+
   const meterColor = strength.score >= 80 ? "var(--green)" : strength.score >= 55 ? "var(--orange)" : "var(--red)";
   const kindIndex = KINDS.findIndex((k) => k.id === kind);
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
@@ -880,7 +884,7 @@ function App() {
           <section className="stage" aria-label="Preview">
             <div className="sticker-wrap">
               <div className={"sticker" + (frame === "badge" && ready ? " is-framed" : "") + (bounce ? " bounce" : "")}
-                style={{ backgroundColor: frame === "badge" && ready && validHex(fg) ? fg : validHex(bg) ? bg : "#fff" }}>
+                style={{ backgroundColor: stickerBg, "--on-sticker": onSticker }}>
                 {qrSrc ? (
                   <img key={qrSrc} src={qrSrc} alt={`QR code for ${label}`} className={"qr-img" + (loading ? " is-updating" : "")} />
                 ) : (

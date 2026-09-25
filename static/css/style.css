@@ -1253,6 +1253,9 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   place-items: center;
   aspect-ratio: 1 / 1;
   box-shadow: 0 0 0 .5px rgba(255, 255, 255, .12), 0 30px 60px -12px rgba(0, 0, 0, .8), 0 18px 36px -18px rgba(0, 0, 0, .9);
+  /* brand-yellow ring around the card, so dark colors still stand out from the page */
+  outline: 2px solid rgba(255, 214, 10, .55);
+  outline-offset: 5px;
   transition: background-color .4s var(--ease), transform .5s var(--ease);
   overflow: hidden;
 }
@@ -1336,7 +1339,8 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 
 .empty {
   text-align: center;
-  color: rgba(0, 0, 0, .45);
+  color: var(--on-sticker, rgba(0, 0, 0, .75));
+  transition: color .4s var(--ease);
   padding: 20px;
 }
 
