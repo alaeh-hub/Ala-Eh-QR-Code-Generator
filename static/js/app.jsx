@@ -4,12 +4,12 @@ const { useState, useEffect, useRef, useCallback, useMemo } = React;
    Data
    ========================================================= */
 const KINDS = [
-  { id: "url",   label: "Link",   icon: "link" },
-  { id: "wifi",  label: "Wi-Fi",  icon: "wifi" },
-  { id: "tel",   label: "Call",   icon: "phone" },
-  { id: "sms",   label: "Text",   icon: "sms" },
-  { id: "email", label: "Email",  icon: "mail" },
-  { id: "text",  label: "Note",   icon: "note" },
+  { id: "url", label: "Link", icon: "link" },
+  { id: "wifi", label: "Wi-Fi", icon: "wifi" },
+  { id: "tel", label: "Call", icon: "phone" },
+  { id: "sms", label: "Text", icon: "sms" },
+  { id: "email", label: "Email", icon: "mail" },
+  { id: "text", label: "Note", icon: "note" },
 ];
 
 const QUICK_LINKS = [
@@ -23,30 +23,30 @@ const QUICK_LINKS = [
 
 const PRESETS = [
   { name: "Salakot", fg: "#000000", fg2: "#000000", bg: "#FFD400", gradient: "none", note: "Black on yellow" },
-  { name: "Uling",   fg: "#000000", fg2: "#000000", bg: "#FFFFFF", gradient: "none", note: "Black on white" },
-  { name: "Pulot",   fg: "#000000", fg2: "#6B4A00", bg: "#FFD400", gradient: "radial", note: "Black to honey on yellow" },
-  { name: "Ginto",   fg: "#1A1A1A", fg2: "#9A7400", bg: "#FFFFFF", gradient: "vertical", note: "Black to gold on white" },
-  { name: "Sili",    fg: "#B81A13", fg2: "#B81A13", bg: "#FFFFFF", gradient: "none", note: "Chili red on white" },
-  { name: "Banig",   fg: "#3B2410", fg2: "#3B2410", bg: "#FFF1C2", gradient: "none", note: "Brown on rice cream" },
+  { name: "Uling", fg: "#000000", fg2: "#000000", bg: "#FFFFFF", gradient: "none", note: "Black on white" },
+  { name: "Pulot", fg: "#000000", fg2: "#6B4A00", bg: "#FFD400", gradient: "radial", note: "Black to honey on yellow" },
+  { name: "Ginto", fg: "#1A1A1A", fg2: "#9A7400", bg: "#FFFFFF", gradient: "vertical", note: "Black to gold on white" },
+  { name: "Sili", fg: "#B81A13", fg2: "#B81A13", bg: "#FFFFFF", gradient: "none", note: "Chili red on white" },
+  { name: "Banig", fg: "#3B2410", fg2: "#3B2410", bg: "#FFF1C2", gradient: "none", note: "Brown on rice cream" },
 ];
 
 const PATTERNS = [
   { id: "rounded", label: "Rounded" },
-  { id: "square",  label: "Square" },
-  { id: "dots",    label: "Dots" },
-  { id: "gapped",  label: "Tiles" },
-  { id: "vbars",   label: "Columns" },
-  { id: "hbars",   label: "Rows" },
+  { id: "square", label: "Square" },
+  { id: "dots", label: "Dots" },
+  { id: "gapped", label: "Tiles" },
+  { id: "vbars", label: "Columns" },
+  { id: "hbars", label: "Rows" },
 ];
 const EYES = [
   { id: "rounded", label: "Soft" },
-  { id: "square",  label: "Sharp" },
-  { id: "dots",    label: "Dotted" },
+  { id: "square", label: "Sharp" },
+  { id: "dots", label: "Dotted" },
 ];
 const FRAMES = [
-  { id: "none",    label: "None" },
+  { id: "none", label: "None" },
   { id: "caption", label: "Text below" },
-  { id: "badge",   label: "Sticker" },
+  { id: "badge", label: "Sticker" },
 ];
 const GRADIENTS = [
   { id: "none", label: "Solid" },
@@ -230,18 +230,18 @@ function Icon({ name, size = 18, stroke = 2 }) {
 
 /* Little previews for pattern, eye and frame tiles */
 function PatternPreview({ id }) {
-  const cells = [[0,0],[1,0],[3,0],[0,1],[2,1],[3,1],[1,2],[2,2],[0,3],[2,3],[3,3]];
+  const cells = [[0, 0], [1, 0], [3, 0], [0, 1], [2, 1], [3, 1], [1, 2], [2, 2], [0, 3], [2, 3], [3, 3]];
   const s = 7, g = 1;
   return (
     <svg width="34" height="34" viewBox="0 0 32 32" aria-hidden="true">
       {cells.map(([x, y], i) => {
         const cx = x * 8 + 4, cy = y * 8 + 4;
         if (id === "dots") return <circle key={i} cx={cx} cy={cy} r="3.4" fill="currentColor" />;
-        if (id === "rounded") return <rect key={i} x={x*8+g/2} y={y*8+g/2} width={s} height={s} rx="3" fill="currentColor" />;
-        if (id === "gapped") return <rect key={i} x={x*8+1.5} y={y*8+1.5} width="5" height="5" fill="currentColor" />;
-        if (id === "vbars") return <rect key={i} x={x*8+1} y={y*8} width="6" height="8" rx="3" fill="currentColor" />;
-        if (id === "hbars") return <rect key={i} x={x*8} y={y*8+1} width="8" height="6" rx="3" fill="currentColor" />;
-        return <rect key={i} x={x*8} y={y*8} width="8" height="8" fill="currentColor" />;
+        if (id === "rounded") return <rect key={i} x={x * 8 + g / 2} y={y * 8 + g / 2} width={s} height={s} rx="3" fill="currentColor" />;
+        if (id === "gapped") return <rect key={i} x={x * 8 + 1.5} y={y * 8 + 1.5} width="5" height="5" fill="currentColor" />;
+        if (id === "vbars") return <rect key={i} x={x * 8 + 1} y={y * 8} width="6" height="8" rx="3" fill="currentColor" />;
+        if (id === "hbars") return <rect key={i} x={x * 8} y={y * 8 + 1} width="8" height="6" rx="3" fill="currentColor" />;
+        return <rect key={i} x={x * 8} y={y * 8} width="8" height="8" fill="currentColor" />;
       })}
     </svg>
   );
@@ -378,7 +378,7 @@ function Toasts({ items }) {
     <div className="toasts" aria-live="polite">
       {items.map((t) => (
         <div key={t.id} className={"toast" + (t.error ? " is-error" : "")}>
-          <Icon name={t.error ? "alert" : "check"} size={18} stroke={2.6} /> {t.text}
+          <span className="toast-icon"><Icon name={t.error ? "alert" : "check"} size={14} stroke={3} /></span> {t.text}
         </div>
       ))}
     </div>
@@ -432,9 +432,9 @@ function KindFields({ kind, f, set }) {
         </div>
       )}
       <label className="toggle">
-        <input type="checkbox" checked={f.hidden} onChange={(e) => set("hidden", e.target.checked)} />
+        <span>Hidden network</span>
+        <input type="checkbox" role="switch" checked={f.hidden} onChange={(e) => set("hidden", e.target.checked)} />
         <span className="toggle-track" aria-hidden="true" />
-        Hidden network
       </label>
       <p className="hint">Customers scan to join your store Wi-Fi without typing the password.</p>
     </div>
@@ -514,6 +514,15 @@ function App() {
   const [swapSpin, setSwapSpin] = useState(false);
   const [bounce, setBounce] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  /* Large title collapses into the nav bar on scroll, like iOS */
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 70);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const lastUrl = useRef(null);
   const reqId = useRef(0);
@@ -687,32 +696,35 @@ function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [ready]);
 
-  const meterColor = strength.score >= 80 ? "var(--yellow)" : strength.score >= 55 ? "var(--gold)" : "var(--sili)";
+  const meterColor = strength.score >= 80 ? "var(--green)" : strength.score >= 55 ? "var(--orange)" : "var(--red)";
   const kindIndex = KINDS.findIndex((k) => k.id === kind);
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
 
   /* ---------- render ---------- */
   return (
     <>
+      <nav className={"navbar" + (scrolled ? " is-scrolled" : "")} aria-label="App">
+        <div className="navbar-inner">
+          <img src={window.LOGO_URL} alt="" className="navbar-logo" />
+          <span className="navbar-title" aria-hidden={!scrolled}>QR Code Maker</span>
+          <button type="button" className="nav-btn" onClick={reset}>
+            Start Over
+          </button>
+        </div>
+      </nav>
+
       <div className="page">
-        <header className="masthead">
-          <img src={window.LOGO_URL} alt="Ala Eh! Food Products logo" className="masthead-logo" />
+        <header className="largetitle">
+          <img src={window.LOGO_URL} alt="Ala Eh! Food Products logo" className="app-icon" />
           <div>
-            <h1>QR code maker</h1>
-            <p>Make a code for your page, store Wi-Fi, order number or menu, styled like Ala Eh!, ready for labels, menus and tarpaulins.</p>
+            <h1>QR Code Maker</h1>
+            <p>Make a code for your page, store Wi-Fi, order number or menu, ready for labels, menus and tarpaulins.</p>
           </div>
         </header>
 
         <main className="workspace">
           <section className="controls" aria-label="QR code settings">
-            <div className="controls-head">
-              <h2>Settings</h2>
-              <button type="button" className="btn btn-ghost" onClick={reset}>
-                <Icon name="reset" size={16} /> Start over
-              </button>
-            </div>
-
-            <Section id="content" icon="link" title="What the code opens" summary={filled ? label : KINDS[kindIndex].label} open={open.content} onToggle={toggle}>
+            <Section id="content" icon="link" title="Content" summary={filled ? label : KINDS[kindIndex].label} open={open.content} onToggle={toggle}>
               <div className="tabs">
                 <div className="tabs-inner" role="tablist" aria-label="Code type" style={{ "--n": KINDS.length, "--i": kindIndex }}>
                   <span className="tabs-indicator" aria-hidden="true" />
@@ -775,7 +787,7 @@ function App() {
               )}
             </Section>
 
-            <Section id="style" icon="grid" title="Pattern and corners"
+            <Section id="style" icon="grid" title="Pattern & Corners"
               summary={`${PATTERNS.find((p) => p.id === style).label}, ${EYES.find((e) => e.id === eye).label.toLowerCase()} corners`}
               open={open.style} onToggle={toggle}>
               <div className="group">
@@ -790,13 +802,13 @@ function App() {
                 value={border} onChange={setBorder} display={(v) => `${v} blocks`} />
             </Section>
 
-            <Section id="logo" icon="badge" title="Center logo"
+            <Section id="logo" icon="badge" title="Center Logo"
               summary={useLogo ? `${logoFile ? "Custom" : "Ala Eh!"} logo, ${Math.round(logoScale * 100)}%` : "Off"}
               open={open.logo} onToggle={toggle}>
               <label className="toggle">
-                <input type="checkbox" checked={useLogo} onChange={(e) => setUseLogo(e.target.checked)} />
+                <span>Put a logo in the center</span>
+                <input type="checkbox" role="switch" checked={useLogo} onChange={(e) => setUseLogo(e.target.checked)} />
                 <span className="toggle-track" aria-hidden="true" />
-                Put a logo in the center
               </label>
               <div className={"collapse" + (useLogo ? " is-open" : "")}>
                 <div inert={useLogo ? undefined : ""}>
@@ -823,7 +835,7 @@ function App() {
               </div>
             </Section>
 
-            <Section id="frame" icon="type" title="Frame and text"
+            <Section id="frame" icon="type" title="Frame & Text"
               summary={FRAMES.find((f) => f.id === frame).label + (caption && frame !== "none" ? `: ${caption}` : "")}
               open={open.frame} onToggle={toggle}>
               <Tiles label="Frame" options={FRAMES} value={frame} onChange={setFrame} Preview={FramePreview} />
@@ -869,7 +881,7 @@ function App() {
                     <p>{kind === "url" ? "Paste a link and your code shows up here." : "Fill in the details and your code shows up here."}</p>
                   </div>
                 )}
-                {loading && <span className="scanline" aria-hidden="true" />}
+                {loading && <span className="spinner" aria-hidden="true" />}
               </div>
             </div>
             <span className="sr-only" aria-live="polite">{loading ? "Updating code" : ready ? "Code ready" : ""}</span>
@@ -895,15 +907,15 @@ function App() {
               download={fileName}
               aria-disabled={!ready}
               onClick={onDownload}>
-              <Icon name="download" size={22} stroke={2.6} />
+              <Icon name="download" size={20} stroke={2.4} />
               Download {format.toUpperCase()}
-              <span className="kbd">{isMac ? "⌘S" : "Ctrl+S"}</span>
+              <span className="kbd">{isMac ? "⌘S" : "Ctrl S"}</span>
             </a>
 
             <div className="actions">
-              <button type="button" className="btn" onClick={onCopy} disabled={!ready}><Icon name="copy" size={16} /> Copy</button>
-              <button type="button" className="btn" onClick={onShare} disabled={!ready || !canShare} title={canShare ? "" : "Not supported in this browser"}><Icon name="share" size={16} /> Share</button>
-              <button type="button" className="btn" onClick={onPrint} disabled={!ready}><Icon name="print" size={16} /> Print</button>
+              <button type="button" className="action" onClick={onCopy} disabled={!ready}><Icon name="copy" size={20} /><span>Copy</span></button>
+              <button type="button" className="action" onClick={onShare} disabled={!ready || !canShare} title={canShare ? "" : "Not supported in this browser"}><Icon name="share" size={20} /><span>Share</span></button>
+              <button type="button" className="action" onClick={onPrint} disabled={!ready}><Icon name="print" size={20} /><span>Print</span></button>
             </div>
             <p className="hint center">Test-scan with your phone before printing.</p>
           </section>
@@ -912,8 +924,8 @@ function App() {
         {history.length > 0 && (
           <section className="history" aria-label="Recent codes">
             <div className="history-head">
-              <h2>Recent codes</h2>
-              <button type="button" className="btn btn-ghost" onClick={clearHistory}>Clear all</button>
+              <h2>Recent</h2>
+              <button type="button" className="btn btn-ghost" onClick={clearHistory}>Clear</button>
             </div>
             <div className="history-list">
               {history.map((h, i) => (
@@ -934,7 +946,7 @@ function App() {
           </section>
         )}
 
-        <footer className="foot"><strong>Ala Eh! Food Products</strong>, specially made recipe sa panlasang Pinoy</footer>
+        <footer className="foot">Ala Eh! Food Products. Specially made recipe sa panlasang Pinoy.</footer>
       </div>
 
       {qrSrc && <img className="print-only" src={qrSrc} alt="" />}

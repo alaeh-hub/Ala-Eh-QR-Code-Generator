@@ -31,7 +31,7 @@ from qrcode.image.styles.moduledrawers.pil import (
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_LOGO = os.path.join(BASE_DIR, "static", "img", "logo.jpg")
+DEFAULT_LOGO = os.path.join(BASE_DIR, "static", "img", "logo.png")
 
 try:
     LANCZOS = Image.Resampling.LANCZOS
@@ -97,12 +97,13 @@ def wifi_escape(s):
 def build_payload(opts):
     """Turn the form fields for each code type into the text the QR holds."""
     kind = opts.get("kind", "url")
-    get = lambda k: (opts.get(k) or "").strip()
+    def get(k): return (opts.get(k) or "").strip()
 
     if kind == "url":
         url = normalize_url(get("url"))
         if not url:
-            raise ValueError("Enter a full link, like https://www.facebook.com/yourpage")
+            raise ValueError(
+                "Enter a full link, like https://www.facebook.com/yourpage")
         return url
 
     if kind == "wifi":
@@ -113,7 +114,8 @@ def build_payload(opts):
         if security not in ("WPA", "WEP", "NOPASS"):
             security = "WPA"
         if security != "NOPASS" and not password:
-            raise ValueError("Enter the Wi-Fi password, or set security to None.")
+            raise ValueError(
+                "Enter the Wi-Fi password, or set security to None.")
         hidden = "H:true;" if get("hidden") == "true" else ""
         pw = f"P:{wifi_escape(password)};" if security != "NOPASS" else ""
         return f"WIFI:T:{security};S:{wifi_escape(ssid)};{pw}{hidden};"
@@ -147,7 +149,8 @@ def build_payload(opts):
         if not text:
             raise ValueError("Type the text the code should show.")
         if len(text) > 800:
-            raise ValueError("Text is over 800 characters. Shorten it so the code stays scannable.")
+            raise ValueError(
+                "Text is over 800 characters. Shorten it so the code stays scannable.")
         return text
 
     raise ValueError("Unknown code type.")
@@ -176,7 +179,8 @@ def circle_logo(logo, size, ring_color, ring_px):
     ImageDraw.Draw(mask).ellipse((0, 0, inner - 1, inner - 1), fill=255)
 
     badge = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    ImageDraw.Draw(badge).ellipse((0, 0, size - 1, size - 1), fill=ring_color + (255,))
+    ImageDraw.Draw(badge).ellipse(
+        (0, 0, size - 1, size - 1), fill=ring_color + (255,))
     badge.paste(logo, (ring_px, ring_px), mask)
     return badge
 
@@ -226,7 +230,8 @@ def apply_frame(img, frame, caption, fg, bg):
         canvas.paste(img, (0, 0))
         d = ImageDraw.Draw(canvas)
         font, box = fit_font(d, caption, int(size * 0.86), int(size * 0.065))
-        draw_centered(d, caption, font, box, (0, size - int(size * 0.03), size, size + pad - int(size * 0.02)), fg + (255,))
+        draw_centered(d, caption, font, box, (0, size - int(size * 0.03),
+                      size, size + pad - int(size * 0.02)), fg + (255,))
         return canvas
 
     if frame == "badge":
@@ -237,12 +242,15 @@ def apply_frame(img, frame, caption, fg, bg):
         w, h = size + edge * 2, size + edge * 2 + band
         canvas = Image.new("RGBA", (w, h), (0, 0, 0, 0))
         d = ImageDraw.Draw(canvas)
-        d.rounded_rectangle((0, 0, w - 1, h - 1), radius=radius, fill=fg + (255,))
+        d.rounded_rectangle((0, 0, w - 1, h - 1),
+                            radius=radius, fill=fg + (255,))
         inner = Image.new("L", (size, size), 0)
-        ImageDraw.Draw(inner).rounded_rectangle((0, 0, size - 1, size - 1), radius=int(radius * 0.6), fill=255)
+        ImageDraw.Draw(inner).rounded_rectangle(
+            (0, 0, size - 1, size - 1), radius=int(radius * 0.6), fill=255)
         canvas.paste(img, (edge, edge), inner)
         font, box = fit_font(d, text, int(w * 0.84), int(size * 0.075))
-        draw_centered(d, text, font, box, (0, size + edge, w, h - edge // 2), bg + (255,))
+        draw_centered(d, text, font, box, (0, size + edge,
+                      w, h - edge // 2), bg + (255,))
         return canvas
 
     return img
@@ -279,13 +287,15 @@ def build_qr(opts, logo_file=None):
         color_mask=make_color_mask(fg, fg2, bg, gradient),
     )
     try:
-        img = qr.make_image(eye_drawer=EYE_DRAWERS.get(eye, EYE_DRAWERS["rounded"])(), **kwargs)
+        img = qr.make_image(eye_drawer=EYE_DRAWERS.get(
+            eye, EYE_DRAWERS["rounded"])(), **kwargs)
     except TypeError:  # qrcode < 7.4 has no eye_drawer
         img = qr.make_image(**kwargs)
     img = img.convert("RGBA")
 
     if use_logo:
-        source = Image.open(logo_file) if logo_file else Image.open(DEFAULT_LOGO)
+        source = Image.open(
+            logo_file) if logo_file else Image.open(DEFAULT_LOGO)
         badge_px = int(img.width * logo_scale)
         badge = circle_logo(source, badge_px, bg, max(4, badge_px // 18))
         pos = ((img.width - badge_px) // 2, (img.height - badge_px) // 2)
@@ -315,7 +325,8 @@ def index():
 @app.route("/api/qr", methods=["POST"])
 def api_qr():
     try:
-        data, fmt, length = build_qr(request.form, request.files.get("logoFile"))
+        data, fmt, length = build_qr(
+            request.form, request.files.get("logoFile"))
     except ValueError as e:
         return jsonify(error=str(e)), 400
     except Exception:

@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#000000" />
   <title>Ala Eh! QR Code Maker</title>
-  <link rel="icon" href="{{ url_for('static', filename='img/logo.jpg') }}" />
+  <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
+
 <body>
   <div id="root">
     <div class="boot" aria-label="Loading">
-      <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="" />
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="" />
     </div>
   </div>
 
-  <script>window.LOGO_URL = "{{ url_for('static', filename='img/logo.jpg') }}";</script>
+  <script>window.LOGO_URL = "{{ url_for('static', filename='img/logo.png') }}";</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
   <script type="text/babel" data-presets="react" src="{{ url_for('static', filename='js/app.jsx') }}"></script>
 </body>
+
 </html>
