@@ -22,12 +22,12 @@ const QUICK_LINKS = [
 ];
 
 const PRESETS = [
-  { name: "Salakot", fg: "#000000", fg2: "#000000", bg: "#FFD400", gradient: "none", note: "Black on yellow" },
-  { name: "Uling", fg: "#000000", fg2: "#000000", bg: "#FFFFFF", gradient: "none", note: "Black on white" },
-  { name: "Pulot", fg: "#000000", fg2: "#6B4A00", bg: "#FFD400", gradient: "radial", note: "Black to honey on yellow" },
-  { name: "Ginto", fg: "#1A1A1A", fg2: "#9A7400", bg: "#FFFFFF", gradient: "vertical", note: "Black to gold on white" },
-  { name: "Sili", fg: "#B81A13", fg2: "#B81A13", bg: "#FFFFFF", gradient: "none", note: "Chili red on white" },
-  { name: "Banig", fg: "#3B2410", fg2: "#3B2410", bg: "#FFF1C2", gradient: "none", note: "Brown on rice cream" },
+  { name: "Toyo", fg: "#FFFFFF", fg2: "#FFFFFF", bg: "#1A0F08", gradient: "none", note: "White on soy-dark brown" },
+  { name: "Suka", fg: "#3B2410", fg2: "#3B2410", bg: "#F3E9D2", gradient: "none", note: "Brown on pale vinegar cream" },
+  { name: "Catsup", fg: "#FFFFFF", fg2: "#FFE9B3", bg: "#D94A1A", gradient: "vertical", note: "White to cream on banana-catsup orange" },
+  { name: "Sili", fg: "#FFFFFF", fg2: "#FFFFFF", bg: "#B81A13", gradient: "none", note: "White on chili red" },
+  { name: "Oil", fg: "#5C3A00", fg2: "#5C3A00", bg: "#FFC93C", gradient: "radial", note: "Amber brown on cooking-oil gold" },
+  { name: "Patis", fg: "#2B1B00", fg2: "#8A5A1E", bg: "#F6D98A", gradient: "vertical", note: "Dark to amber brown on patis gold" },
 ];
 
 const PATTERNS = [
