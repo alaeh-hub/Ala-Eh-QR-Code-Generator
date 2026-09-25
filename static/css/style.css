@@ -42,6 +42,8 @@ body {
 }
 
 html {
+  /* keep the scrollbar's space reserved so nothing shifts when the intro unlocks scrolling */
+  scrollbar-gutter: stable;
   scroll-padding-top: calc(60px + env(safe-area-inset-top, 0px));
 }
 
@@ -85,6 +87,12 @@ img {
 }
 
 /* ---------- splash (3D logo intro) ---------- */
+/* Keep the page still under the intro so the landing spot doesn't move */
+html.splash-lock,
+html.splash-lock body {
+  overflow: hidden;
+}
+
 .splash {
   position: fixed;
   inset: 0;
@@ -93,6 +101,7 @@ img {
   place-items: center;
   background: #000;
   cursor: pointer;
+  touch-action: none;
   transition: opacity .5s ease, visibility .5s ease;
 }
 

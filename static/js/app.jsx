@@ -392,10 +392,18 @@ function KindFields({ kind, f, set }) {
   const [showPw, setShowPw] = useState(false);
   const field = (k) => ({ value: f[k], onChange: (e) => set(k, e.target.value) });
 
+  /* Focus the link box on desktop only, and without scrolling to it.
+     On phones the box sits below the preview, so focusing would jump the page
+     down (and pop up the keyboard) before anyone has touched anything. */
+  useEffect(() => {
+    if (kind !== "url" || !window.matchMedia("(pointer: fine)").matches) return;
+    document.getElementById("url")?.focus({ preventScroll: true });
+  }, [kind]);
+
   if (kind === "url") return (
     <div className="kind-panel" key="url">
       <TextInput id="url" label="Link" type="url" inputMode="url" className="big-input"
-        placeholder="https://www.facebook.com/alaehfoodproducts" autoFocus
+        placeholder="https://www.facebook.com/alaehfoodproducts"
         clearable onClear={() => set("url", "")} {...field("url")} />
       <div className="chips" aria-label="Start with">
         {QUICK_LINKS.map((q) => (

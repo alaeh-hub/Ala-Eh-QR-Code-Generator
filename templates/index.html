@@ -28,10 +28,17 @@
   <script>
     (function () {
       var splash = document.getElementById("splash");
+      // Start at the top on every load so the coin lands on the big header logo,
+      // and hold the page still while the intro plays.
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      window.scrollTo(0, 0);
+      document.documentElement.classList.add("splash-lock");
+      function unlock() { document.documentElement.classList.remove("splash-lock"); }
       var video = splash.querySelector("video");
       var done = false;
       var LOGO_FILL = 881 / 1080; // share of the video frame the round logo covers
       function fade() {
+        unlock();
         splash.classList.add("is-hidden");
         setTimeout(function () { splash.remove(); }, 600);
       }
@@ -99,6 +106,7 @@
           // The twin sits exactly on the real logo now; swap them in the same frame.
           target.style.visibility = "";
           splash.remove();
+          unlock();
           target.animate([
             { transform: "scale(1)" }, { transform: "scale(1.07)", offset: .35 }, { transform: "scale(1)" }
           ], { duration: 420, easing: "cubic-bezier(.3,.7,.4,1)" });
