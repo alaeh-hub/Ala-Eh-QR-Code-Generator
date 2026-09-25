@@ -14,6 +14,43 @@
 </head>
 
 <body>
+  <div id="splash" class="splash" aria-hidden="true">
+    <video class="splash-video" autoplay muted playsinline preload="auto"
+      poster="{{ url_for('static', filename='img/alaeh-logo-3d-poster.png') }}">
+      <source src="{{ url_for('static', filename='video/alaeh-logo-3d.webm') }}" type="video/webm" />
+      <source src="{{ url_for('static', filename='video/alaeh-logo-3d-black.mp4') }}" type="video/mp4" />
+    </video>
+  </div>
+  <script>
+    (function () {
+      var splash = document.getElementById("splash");
+      var video = splash.querySelector("video");
+      var done = false;
+      function hide() {
+        if (done) return;
+        done = true;
+        splash.classList.add("is-hidden");
+        setTimeout(function () { splash.remove(); }, 600);
+      }
+      var seen = false;
+      try { seen = sessionStorage.getItem("alaeh-splash-seen") === "1"; } catch (e) {}
+      if (seen) { splash.remove(); return; }
+      try { sessionStorage.setItem("alaeh-splash-seen", "1"); } catch (e) {}
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        video.removeAttribute("autoplay");
+        video.pause();
+        setTimeout(hide, 900);
+        return;
+      }
+      video.addEventListener("ended", hide);
+      video.addEventListener("error", hide, true);
+      splash.addEventListener("click", hide);
+      var p = video.play();
+      if (p && p.catch) p.catch(function () { setTimeout(hide, 1200); });
+      setTimeout(hide, 7000); // safety net if the video stalls
+    })();
+  </script>
+
   <div id="root">
     <div class="boot" aria-label="Loading">
       <img src="{{ url_for('static', filename='img/logo.png') }}" alt="" />

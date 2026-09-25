@@ -84,6 +84,32 @@ img {
   animation: breathe 1.4s ease-in-out infinite;
 }
 
+/* ---------- splash (3D logo intro) ---------- */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: #000;
+  cursor: pointer;
+  transition: opacity .5s ease, visibility .5s ease;
+}
+
+.splash.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash-video {
+  width: min(78vw, 78vh, 520px);
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: transparent;
+}
+
 @keyframes breathe {
   50% {
     transform: scale(.94);
