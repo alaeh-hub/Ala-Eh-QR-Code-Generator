@@ -224,7 +224,8 @@ def draw_centered(draw, text, font, box, area, fill):
 
 def apply_frame(img, frame, caption, fg, bg):
     size = img.width
-    if frame == "caption" and caption:
+    if frame == "caption":
+        caption = caption or "Scan para umorder!"
         pad = int(size * 0.12)
         canvas = Image.new("RGBA", (size, size + pad), bg + (255,))
         canvas.paste(img, (0, 0))

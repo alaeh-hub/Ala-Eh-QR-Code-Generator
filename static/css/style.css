@@ -234,6 +234,37 @@ html.splash-lock body {
   clip-path: circle(42% at 50% 50%);
 }
 
+/* Hold the page's entrance until the coin takes off, so it rises in underneath the flight */
+html.intro-hold .controls,
+html.intro-hold .stage,
+html.intro-hold .sticker-wrap,
+html.intro-hold .history {
+  animation-play-state: paused;
+}
+
+/* Shockwave and sparks where the coin lands */
+.land-ring {
+  position: fixed;
+  z-index: 10000;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 214, 10, .9);
+  box-shadow: 0 0 18px rgba(255, 196, 46, .7), inset 0 0 12px rgba(255, 196, 46, .4);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.land-spark {
+  position: fixed;
+  z-index: 10000;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FFE27A;
+  box-shadow: 0 0 8px 2px rgba(255, 196, 46, .8);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .splash-stage,
   .splash-glow {
@@ -1263,6 +1294,11 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 .sticker.is-framed {
   aspect-ratio: auto;
   padding: 12px;
+}
+
+/* "Text below" adds a caption strip under the code, so the image is taller than it is wide */
+.sticker.is-captioned {
+  aspect-ratio: auto;
 }
 
 .sticker.bounce {

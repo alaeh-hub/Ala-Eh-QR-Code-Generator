@@ -883,7 +883,7 @@ function App() {
 
           <section className="stage" aria-label="Preview">
             <div className="sticker-wrap">
-              <div className={"sticker" + (frame === "badge" && ready ? " is-framed" : "") + (bounce ? " bounce" : "")}
+              <div className={"sticker" + (frame === "badge" && ready ? " is-framed" : "") + (frame === "caption" && ready ? " is-captioned" : "") + (bounce ? " bounce" : "")}
                 style={{ backgroundColor: stickerBg, "--on-sticker": onSticker }}>
                 {qrSrc ? (
                   <img key={qrSrc} src={qrSrc} alt={`QR code for ${label}`} className={"qr-img" + (loading ? " is-updating" : "")} />

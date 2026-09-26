@@ -32,13 +32,17 @@
       // and hold the page still while the intro plays.
       if ("scrollRestoration" in history) history.scrollRestoration = "manual";
       window.scrollTo(0, 0);
-      document.documentElement.classList.add("splash-lock");
+      document.documentElement.classList.add("splash-lock", "intro-hold");
       function unlock() { document.documentElement.classList.remove("splash-lock"); }
+      // Page content waits behind the intro, then rises in as the coin flies to its spot.
+      function release() { document.documentElement.classList.remove("intro-hold"); }
+      setTimeout(release, 9000); // never leave the page hidden if something goes wrong
       var video = splash.querySelector("video");
       var done = false;
       var LOGO_FILL = 881 / 1080; // share of the video frame the round logo covers
       function fade() {
         unlock();
+        release();
         splash.classList.add("is-hidden");
         setTimeout(function () { splash.remove(); }, 600);
       }
@@ -56,9 +60,35 @@
       }
       // Fly the coin along a gentle arc into the page logo. Halfway there it
       // cross-fades into an exact copy of that logo, so it lands pixel-perfect.
-      var FLY_MS = 1150;
-      function ease(t) { // smooth ease-in-out with a soft start and a long settle
-        return t < .5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
+      var FLY_MS = 1400;
+      var WINDUP = .14; // share of the flight spent gathering before launch
+      function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+      function ease(t) { // quick launch, long glide into place
+        return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+      // Gold shockwave and sparks where the coin lands.
+      function burst(r) {
+        var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        var ring = document.createElement("div");
+        ring.className = "land-ring";
+        ring.style.cssText = "left:" + r.left + "px;top:" + r.top + "px;width:" + r.width + "px;height:" + r.height + "px";
+        document.body.appendChild(ring);
+        ring.animate([
+          { transform: "scale(.9)", opacity: .95 },
+          { transform: "scale(2.1)", opacity: 0 }
+        ], { duration: 700, easing: "cubic-bezier(.2,.7,.3,1)" }).onfinish = function () { ring.remove(); };
+        for (var i = 0; i < 12; i++) {
+          var s = document.createElement("span");
+          s.className = "land-spark";
+          s.style.cssText = "left:" + cx + "px;top:" + cy + "px";
+          document.body.appendChild(s);
+          var a = (i / 12) * Math.PI * 2 + Math.random() * .4;
+          var dist = r.width * (.75 + Math.random() * .55);
+          s.animate([
+            { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
+            { transform: "translate(calc(-50% + " + Math.cos(a) * dist + "px),calc(-50% + " + Math.sin(a) * dist + "px)) scale(0)", opacity: 0 }
+          ], { duration: 520 + Math.random() * 260, easing: "cubic-bezier(.15,.8,.3,1)" }).onfinish = function () { this.effect.target.remove(); };
+        }
       }
       function hide() {
         if (done) return;
@@ -87,18 +117,35 @@
         twin.style.cssText = "left:" + t.left + "px;top:" + t.top + "px;width:" + t.width + "px;height:" + t.height + "px;filter:" + getComputedStyle(target).filter;
         splash.appendChild(twin);
 
-        var vFrames = [], tFrames = [], N = 48;
+        // Which way the coin travels, for banking into the turn like it's thrown.
+        var dx = tc.x - vc.x, dy = tc.y - vc.y, dl = Math.hypot(dx, dy) || 1;
+        dx /= dl; dy /= dl;
+
+        // Sample the motion densely and play it back linearly, so every frame is on the curve.
+        var vFrames = [], tFrames = [], N = 120;
         for (var i = 0; i <= N; i++) {
-          var e = ease(i / N), u = 1 - e;
+          var p = i / N;
+          var e = ease(clamp01((p - WINDUP) / (1 - WINDUP))), u = 1 - e;
           var cx = u * u * vc.x + 2 * u * e * k.x + e * e * tc.x;
           var cy = u * u * vc.y + 2 * u * e * k.y + e * e * tc.y;
           var dia = Math.exp(Math.log(d0) + (Math.log(d1) - Math.log(d0)) * e); // scale evenly, not linearly
-          var mix = Math.min(1, Math.max(0, (e - .45) / .4)); // coin -> logo cross-fade
-          vFrames.push({ transform: "translate(" + (cx - vc.x) + "px," + (cy - vc.y) + "px) scale(" + dia / d0 + ")", opacity: 1 - mix });
-          tFrames.push({ transform: "translate(" + (cx - tc.x) + "px," + (cy - tc.y) + "px) scale(" + dia / d1 + ")", opacity: mix });
+          // Wind-up: swell a little and dip back before launching.
+          var w = Math.sin(Math.PI * clamp01(p / WINDUP));
+          var pull = p < WINDUP ? w * .07 : 0;
+          // Landing thud: a small squash just before touchdown, settling exactly at 1.
+          var land = Math.sin(Math.PI * clamp01((p - .84) / .16));
+          var sc = (1 + pull - land * .09);
+          var bank = Math.sin(Math.PI * e) * 26; // degrees of tilt mid-flight
+          var tilt = "perspective(900px) rotateX(" + (-dy * bank) + "deg) rotateY(" + (dx * bank) + "deg) rotateZ(" + (dx * bank * .35) + "deg)";
+          var back = p < WINDUP ? -w * 14 : 0; // pulled back away from the target
+          var ox = cx + dx * back, oy = cy + dy * back;
+          var mix = clamp01((e - .5) / .35); // coin -> logo cross-fade
+          vFrames.push({ transform: "translate(" + (ox - vc.x) + "px," + (oy - vc.y) + "px) " + tilt + " scale(" + dia / d0 * sc + ")", opacity: 1 - mix });
+          tFrames.push({ transform: "translate(" + (ox - tc.x) + "px," + (oy - tc.y) + "px) " + tilt + " scale(" + dia / d1 * sc + ")", opacity: mix });
         }
         target.style.visibility = "hidden";
         splash.classList.add("is-flying");
+        release();
         video.style.clipPath = "circle(" + (LOGO_FILL * 50) + "% at 50% 50%)";
         var opts = { duration: FLY_MS, easing: "linear", fill: "forwards" };
         video.animate(vFrames, opts);
@@ -107,9 +154,13 @@
           target.style.visibility = "";
           splash.remove();
           unlock();
+          burst(t);
           target.animate([
-            { transform: "scale(1)" }, { transform: "scale(1.07)", offset: .35 }, { transform: "scale(1)" }
-          ], { duration: 420, easing: "cubic-bezier(.3,.7,.4,1)" });
+            { transform: "scale(1)", filter: getComputedStyle(target).filter },
+            { transform: "scale(1.1)", filter: "drop-shadow(0 0 18px rgba(255, 214, 10, .75)) brightness(1.15)", offset: .3 },
+            { transform: "scale(.98)", offset: .65 },
+            { transform: "scale(1)", filter: getComputedStyle(target).filter }
+          ], { duration: 620, easing: "cubic-bezier(.3,.7,.4,1)" });
         };
       }
       // The header logo is rendered by React; give it a moment to mount.
